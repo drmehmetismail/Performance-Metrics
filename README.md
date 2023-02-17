@@ -1,5 +1,48 @@
 # Chess Metrics
 
-This project includes chess metrics (such TEL and AEL) for evaluating performance and breaking ties in chess in a strategyproof manner. The aims of this project is to program the algorithms/metrics proposed in Ismail (2022); see http://dx.doi.org/10.13140/RG.2.2.30995.55848. 
+This project includes chess metrics for evaluating performance and breaking ties in chess in a strategyproof manner. The focus is mostly on chess but other games will also be included.
 
-The focus is mostly on chess but other games are also included.
+This is a Python script that calculates the Game Point Loss (GPL) for a given PGN file using the python-chess library and a chess engine (e.g. Stockfish).
+
+# Requirements
+To use this script, you will need to have the following installed:
+
+Python 3 (https://www.python.org/downloads/)
+python-chess library (https://pypi.org/project/python-chess/)
+Stockfish engine (https://stockfishchess.org/download/)
+
+# Usage
+
+Place your PGN file in the same directory as the GPL.py script.
+The script will play through each move in the PGN file, calculate the GPL (and AGPL) for each player, and print out the results.
+The script will also write the GPLs as a header in the PGN file and save it as a new file.
+
+# License
+This script is released under the GPL-3.0 License. See LICENSE for more information.
+
+# Description of the metrics
+The aim of this project is to program the algorithms/metrics proposed in Ismail (2022); see http://dx.doi.org/10.13140/RG.2.2.30995.55848.
+GPL is a metric defined in Ismail (2022) to evaluate a player's performance in a strategyproof way by a strong chess AI in a game. A win is worth 1 point, a draw is worth 1/2 points, and a loss is worth 0 points. The game point loss is the number of potential points a player loses by making moves compared to the engine win/draw/loss probabilities (or human win/draw/loss probabilities).
+
+For example, if a player is in a winning position and makes a losing move, they lose 1 game point. If they are in a position to win but make a move that leads to a draw, they lose 0.5 game points on average. The GPL for a player in a game is the some of each move game point losses.
+
+The average game point loss is the GPL divided by the number of moves a player has made in the game. This gives an idea of how well a player is playing and how many potential points they are losing per move.
+
+Formally, let L_1 denote the loss of White (player 1) by a move, w^* and d^* denote the win probability of White when White plays the best (or perfect) move in a position. Similarly, w and d denote the win probability of White after White’s actual move. Then, we have the following definition.
+L_1   = 1w^* + 0.5^* - 1w - 0.5d
+
+Game Point Loss (aka TEL)
+GPL of a player is simply the sum of the losses of a player during a game. GPL of White is:
+GPL_1  = L_1 (1)+L_1 (2)+⋯+L_1 (last move n)
+Similarly, GPL of Black is: 
+GPL_2  = L_2 (1)+L_2 (2)+⋯+L_2 (last move m)
+Sometimes White and Black make the same number of moves but it could be that White makes one more or less move than black. 
+
+Average GPL
+Average GPL of White is AGPL_1=(GPL_1)/n and for Black is AGPL_2=(GPL_2)/m.
+AGPL tells us how players performed on average (per move). 
+
+
+Tournament (Total) GPL
+This is simply defined by summing up every GPL of a player in the past games played in a tournament (or in a series of games).
+
