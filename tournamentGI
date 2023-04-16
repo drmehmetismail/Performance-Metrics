@@ -1,0 +1,105 @@
+"""Load PGN files, read the Game Intelligence (GI) and Game Point Loss (GPL) of white and black players
+in the headers of the PGN file. Then, calculate the tournament (total) GPL and 
+average GPL (AGPL) for each player. Write the statistics in a new csv file."""
+
+import os
+import csv
+import chess.pgn
+
+# Read headers of a game from a PGN file
+def read_game_headers(pgn_file):
+    with open(pgn_file) as pgn:
+        # Read a game from the PGN file
+        game = chess.pgn.read_game(pgn)
+        # Return a dictionary with the relevant headers
+        return {
+            'White': game.headers['White'],
+            'Black': game.headers['Black'],
+            'WhiteGPL': game.headers['WhiteGPL'],
+            'BlackGPL': game.headers['BlackGPL'],
+            'WhiteGI': game.headers['WhiteGI'],
+            'BlackGI': game.headers['BlackGI']
+        }
+
+# Update player stats dictionary with new data
+def update_player_stats(player_stats, player, value):
+    # Check if the player is already in the dictionary
+    if player in player_stats:
+        # Update the player's total value and game count
+        player_stats[player][0] += float(value)
+        player_stats[player][1] += 1
+    else:
+        # Add a new entry for the player with the value and game count set to 1
+        player_stats[player] = [float(value), 1]
+
+# Get player stats from PGN files in a directory
+def get_player_stats(pgn_dir):
+    player_stats_gi = {}
+    player_stats_gpl = {}
+
+    # Loop through each file in the directory
+    for file in os.listdir(pgn_dir):
+        # Check if the file is a PGN file
+        if file.endswith(".pgn"):
+            pgn_path = os.path.join(pgn_dir, file)
+            # Read game headers from the PGN file
+            game_headers = read_game_headers(pgn_path)
+            
+            # Update player stats for GI and GPL
+            update_player_stats(player_stats_gi, game_headers['White'], game_headers['WhiteGI'])
+            update_player_stats(player_stats_gi, game_headers['Black'], game_headers['BlackGI'])
+            update_player_stats(player_stats_gpl, game_headers['White'], game_headers['WhiteGPL'])
+            update_player_stats(player_stats_gpl, game_headers['Black'], game_headers['BlackGPL'])
+
+    return player_stats_gi, player_stats_gpl
+
+# Calculate total and average values for the player stats
+def calculate_total_and_average(player_stats):
+    total = {}
+    average = {}
+
+    for player in player_stats:
+        total[player] = player_stats[player][0]
+        average[player] = player_stats[player][0] / player_stats[player][1]
+
+    return total, average
+
+# Write player stats to a CSV file
+def write_player_stats_to_csv(filename, total_gi, avg_gi, total_gpl, avg_gpl):
+    with open(filename, 'w') as f:
+        writer = csv.writer(f)
+        # Write total GI values
+        writer.writerow(['Player', 'TotalGI'])
+        for player in total_gi:
+            writer.writerow([player, total_gi[player]])
+        # Write average GI values
+        writer.writerow(['Player', 'AvgGI'])
+        for player in avg_gi:
+            writer.writerow([player, avg_gi[player]])
+        # Write total GPL values
+        writer.writerow(['Player', 'TotalGPL'])
+        for player in total_gpl:
+            writer.writerow([player, total_gpl[player]])
+        # Write average GPL values
+        writer.writerow(['Player', 'AvgGPL'])
+        for player in avg_gpl:
+            writer.writerow([player, avg_gpl[player]])
+
+# Main function to process PGN files and generate CSV with player stats
+def main():
+    # Set the directory path where the PGN files are located
+    pgn_dir = '/workspaces/Performance-Metrics/Norway22'
+
+    # Get player stats from PGN files in the directory
+    player_stats_gi, player_stats_gpl = get_player_stats(pgn_dir)
+
+    # Calculate total and average GI and GPL for each player
+    total_gi, avg_gi = calculate_total_and_average(player_stats_gi)
+    total_gpl, avg_gpl = calculate_total_and_average(player_stats_gpl)
+
+    # Write the player stats to a CSV file
+    write_player_stats_to_csv('tournamentGI.csv', total_gi, avg_gi, total_gpl, avg_gpl)
+
+# Call the main function
+if __name__ == '__main__':
+    main()
