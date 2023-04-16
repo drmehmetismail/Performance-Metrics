@@ -94,9 +94,9 @@ class ChessAnalyzer:
         self.engine.quit()
 
 if __name__ == "__main__":
-    t = 0.1
-    d = None
-    n = None
+    t = set_time
+    d = set_depth
+    n = set_nodes
     new_file = 'PGN_file_goes_here'
     pgn_file = new_file + '.pgn'
     new_pgn_file = new_file + '_gi.pgn'
