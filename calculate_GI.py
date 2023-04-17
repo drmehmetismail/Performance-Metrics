@@ -161,8 +161,8 @@ def update_json_file(json_file, white_gpl, black_gpl, white_move_number, black_m
 
 # Main function
 def main():
-    folder = '/workspaces/Performance-Metrics/Norway22'
-    engine_path = '/home/linuxbrew/.linuxbrew/Cellar/stockfish/15.1/bin/stockfish'
+    folder = 'folder_path_goes_here'
+    engine_path = 'engine_path_goes_here'
     # Set engine limits d for depth, t for time, and n for nodes
     # d = 20
     t = 2
