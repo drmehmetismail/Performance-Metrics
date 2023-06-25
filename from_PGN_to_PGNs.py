@@ -51,9 +51,6 @@ with open(os.path.join(pgn_file)) as pgn_file:
             
             # Determine the output directory
             output_directory = output_directory_classical
-                
-            # Update round number
-            round = (round + 1) // 2
             
             # Set the filename
             filename = f'gameR{round}.pgn'
