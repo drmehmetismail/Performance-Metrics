@@ -2,10 +2,10 @@ import chess.pgn
 import os
 
 # Define the directory where your PGN file is located
-pgn_file = 'pgn_path_here'
+pgn_file = 'pgn_path'
 
 # Define the directories where you want to write the new PGN files
-output_directory_classical = 'output_folder_path_here'
+output_directory_classical = 'output_folder'
 
 # Create the directories if they don't exist
 os.makedirs(output_directory_classical, exist_ok=True)
@@ -40,8 +40,6 @@ with open(os.path.join(pgn_file)) as pgn_file:
             # Determine the output directory
             output_directory = output_directory_classical
 
-            # Update round number
-            round = (round + 1) // 2
             
             # Set the filename
             filename = f'gameR{round}B{board}.pgn'
@@ -51,6 +49,7 @@ with open(os.path.join(pgn_file)) as pgn_file:
             
             # Determine the output directory
             output_directory = output_directory_classical
+                
             
             # Set the filename
             filename = f'gameR{round}.pgn'
