@@ -1,3 +1,4 @@
+"""This script is for Norway Chess games played in 2019 and later"""
 import chess.pgn
 import os
 
@@ -5,8 +6,8 @@ import os
 pgn_file = 'pgn_path_here'
 
 # Define the directories where you want to write the new PGN files
-output_directory_classical = 'output_folder_path_here'
-output_directory_armageddon = 'output_folder_path_here'
+output_directory_classical = '/output_folder_path_here/NorwayChess{year}'
+output_directory_armageddon = '/output_folder_path_here/NorwayChess{year}armageddon'
 
 # Create the directories if they don't exist
 os.makedirs(output_directory_classical, exist_ok=True)
@@ -23,38 +24,33 @@ with open(os.path.join(pgn_file)) as pgn_file:
             break
 
         # Check if 'Round' and 'Board' exist in game headers
-        if 'Round' in game.headers and 'Board' in game.headers:
-            round_str = game.headers['Round']
-            board_str = game.headers['Board']
+        round_str = game.headers.get('Round', '')
+        board_str = game.headers.get('Board', '')
 
-            # Check if the round and board are integers
-            if not round_str.isdigit() or not board_str.isdigit():
-                print(f"Skipping game with non-numeric Round or Board: Round={round_str}, Board={board_str}")
-                continue
-
-            # Convert the round and board to integers
+        # Check if the round and board are integers
+        if not round_str.isdigit() and not board_str.isdigit():
+            filename = f'game{game.headers["White"]}{game.headers["Black"]}.pgn'
+        elif not board_str.isdigit():
             round = int(round_str)
-            board = int(board_str)
-
-            # Modify the Round header to include the Board number
-            game.headers['Round'] = f'{round}.{board}'
+            # Update round number
+            round_updated = (round + 1) // 2
+            filename = f'gameR{round_updated}.pgn'
         else:
-            print("Skipping game with missing Round or Board header.")
-            continue
+            round = int(round_str)
+            # Update round number
+            round_updated = (round + 1) // 2
+            board = int(board_str)
+            filename = f'gameR{round_updated}B{board}.pgn'
 
         # If 'UTCDate' exists in the headers, copy its value to 'Date'
         if 'UTCDate' in game.headers:
             game.headers['Date'] = game.headers['UTCDate']
 
         # Determine the output directory based on whether the round is odd or even
-        if round % 2 == 0:
-            output_directory = output_directory_armageddon
-        else:
-            output_directory = output_directory_classical
+        output_directory = output_directory_armageddon if round % 2 == 0 else output_directory_classical
 
-        # Update round number
-        round = (round + 1) // 2
+
         # Write the game to a new PGN file in the appropriate directory
-        with open(os.path.join(output_directory, f'gameR{round}B{board}.pgn'), 'w') as output_file:
+        with open(os.path.join(output_directory, filename), 'w') as output_file:
             exporter = chess.pgn.FileExporter(output_file)
             game.accept(exporter)
